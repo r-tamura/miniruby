@@ -13,23 +13,27 @@ $actions = {
   "==" => lambda{|a, b| a == b},
 }
 
-def evaluate(tree)
+def evaluate(tree, env)
   operator = tree[0]
   case operator
   when "lit"
     return tree[1]
   when "func_call"
-    return p(evaluate(tree[2]))
+    return p(evaluate(tree[2], env))
   when "stmts"
     i = 1
     last = nil
     while tree[i] != nil
-      last = evaluate(tree[i])
+      last = evaluate(tree[i], env)
       i = i + 1
     end
     return last
+  when "var_assign"
+    return env[tree[1]] = evaluate(tree[2], env)
+  when "var_ref"
+    return env[tree[1]]
   else
-    return $actions[operator].call(evaluate(tree[1]), evaluate(tree[2]))
+    return $actions[operator].call(evaluate(tree[1], env), evaluate(tree[2], env))
   end
 end
 
