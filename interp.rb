@@ -1,23 +1,34 @@
 require "minruby"
 
-def eval(tree)
+$actions = {
+  "+" => lambda{|a, b| a + b},
+  "-" => lambda{|a, b| a - b},
+  "*" => lambda{|a, b| a * b},
+  "/" => lambda{|a, b| a / b},
+  "%" => lambda{|a, b| a % b},
+  "**" => lambda{|a, b| a ** b},
+  ">" => lambda{|a, b| a > b},
+  "<" => lambda{|a, b| a < b},
+  "==" => lambda{|a, b| a == b},
+}
+
+def evaluate(tree)
   if tree[0] == "lit"
     return tree[1]
   else
-    if tree[0] == "+"
-      return eval(tree[1]) + eval(tree[2])
-    elsif tree[0] == "*"
-      return eval(tree[1]) * eval(tree[2])
-    end
+    operator = tree[0]
+    return $actions[operator].call(evaluate(tree[1]), evaluate(tree[2]))
   end
 end
 
 # Read expression string
-# str = gets
+str = gets
 
 # 抽象構文木
-atree = minruby_parse("1 + 2 * 4")
-p(atree)
+atree = minruby_parse(str)
 
-answer = eval(atree)
+# 評価
+answer = evaluate(atree)
+
+# 出力
 p(answer)
