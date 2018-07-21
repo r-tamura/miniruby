@@ -32,12 +32,26 @@ def evaluate(tree, env)
     return env[tree[1]] = evaluate(tree[2], env)
   when "var_ref"
     return env[tree[1]]
+  when "if"
+    if evaluate(tree[1], env)
+      return evaluate(tree[2], env)
+    else
+      return evaluate(tree[3], env)
+    end
+  when "while"
+    while evaluate(tree[1], env)
+      evaluate(tree[2], env)
+    end
   else
-    return $actions[operator].call(evaluate(tree[1], env), evaluate(tree[2], env))
+    action = $actions[operator]
+    if action != nil
+      return action.call(evaluate(tree[1], env), evaluate(tree[2], env))
+    else
+      # For debug
+      pp(tree)
+    end
   end
 end
-
-
 
 if __FILE__ == $0
   # Read expression string
